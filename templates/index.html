@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>Uncopylocked Games</title>
+    
+        <meta name="description" content="Free Uncopylocked games" />
+        <meta property="og:title" content="Uncopylocked" />
+        <meta property="og:description" content="Free Uncopylocked games" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Uncopylocked" />
+        <meta property="og:url" content="https://uncopylocked.vercel.app" /> 
+        <meta property="og:image" content="{{ url_for('static', filename='uncopylocked.png', _external=True) }}" />
+        
+        <link rel="shortcut icon" href="{{ url_for('static', filename='uncopylocked.png') }}" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Uncopylocked" />
+        <meta name="twitter:description" content="Free Uncopylocked games" />
+        <meta name="twitter:image" content="{{ url_for('static', filename='uncopylocked.png', _external=True) }}" />
+  
+    <meta name="theme-color" content="#12121A" />
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts - Orbitron & Rajdhani for Neon Theme -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <div class="notification" id="notification">
+        <div class="notification-icon">
+            <i class="fas fa-check-circle" id="notif-icon"></i>
+        </div>
+        <div class="notification-content">
+            <span class="notification-title" id="notif-title">Success</span>
+            <span class="notification-message" id="notif-message">Operation completed</span>
+        </div>
+        <button class="notification-close" id="notif-close" type="button">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="notification-progress"></div>
+    </div>
+
+    <nav class="nav-container">
+        <div class="logo">
+            <i class="fas fa-gamepad"></i>
+            <span class="logo-text">Uncopylocked</span>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1 class="fortext">Copy Games:</h1>
+        <form id="extractForm" method="post" action="/">
+            <div class="input-container">
+                <div class="error-message" id="error-message"></div>     
+                <div id="inputs" class="input-wrapper">
+                    <i class="fas fa-link icon-url"></i>
+                    <input name="place_id" id="urlInput" type="password" placeholder="Paste the game here..." autocomplete="off" />
+                    <button id="pasteButton" class="button-paste" type="button">
+                        <i class="fas fa-clipboard" id="Cclear"></i>
+                        <i class="fas fa-times" id="Xclear" style="display:none;"></i>
+                        <span>Paste</span>
+                    </button>
+                </div>
+
+                <button id="fetchImages" type="submit" class="buttons">
+                    <i class="fas fa-download" id="btn-icon"></i>
+                    <span id="btn-text">Copy Game!</span>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
