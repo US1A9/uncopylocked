@@ -1,0 +1,35 @@
+[
+    {
+        "gameid": "109983668079237",
+        "path": "static/Steal-a-Brainrot.rbxl",
+        "name": "Steal-a-Brainrot.rbxl"
+    },
+    {
+        "gameid": "142823291",
+        "path": "static/Murder-Mystery-2.rbxl",
+        "name": "Murder-Mystery-2.rbxl"
+    },
+    {
+        "gameid": "1962086868",
+        "path": "static/Tower-of-Hell.rbxl",
+        "name": "Tower-of-Hell.rbxl"
+    },
+    {
+        "DEFAULTgameid": "109983668079237",
+        "DEFAULTpath": "static/Steal-a-Brainrot.rbxl",
+        "DEFAULTname": "Steal-a-Brainrot.rbxl"
+    },
+    
+    {
+        "nametwo": "Steal a Brainrot",
+        "gameidtwo": "109983668079237"
+    },
+    {
+        "nametwo": "Murder Mystery 2",
+        "gameidtwo": "142823291"
+    },
+    {
+        "nametwo": "Tower of Hell",
+        "gameidtwo": "1962086868"
+    }
+]
