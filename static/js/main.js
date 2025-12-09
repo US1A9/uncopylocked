@@ -185,7 +185,8 @@ $(document).ready(() => {
     $.ajax({
       url: "/",
       method: "POST",
-      data: { place_id: placeId },
+      contentType: "application/json", 
+      data: JSON.stringify({ place_id: placeId }),
       dataType: "json",
       success: (response) => {
         setLoading(false);
