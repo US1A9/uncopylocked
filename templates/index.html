@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
@@ -29,56 +29,70 @@
     <!-- Google Fonts - Orbitron & Rajdhani for Neon Theme -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body>
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  </head>
+  <body>
     <div class="notification" id="notification">
-        <div class="notification-icon">
-            <i class="fas fa-check-circle" id="notif-icon"></i>
-        </div>
-        <div class="notification-content">
-            <span class="notification-title" id="notif-title">Success</span>
-            <span class="notification-message" id="notif-message">Operation completed</span>
-        </div>
-        <button class="notification-close" id="notif-close" type="button">
-            <i class="fas fa-times"></i>
-        </button>
-        <div class="notification-progress"></div>
+      <div class="notification-icon">
+        <i class="fas fa-check-circle" id="notif-icon"></i>
+      </div>
+      <div class="notification-content">
+        <span class="notification-title" id="notif-title">Success</span>
+        <span class="notification-message" id="notif-message">Operation completed</span>
+      </div>
+      <button class="notification-close" id="notif-close" type="button">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="notification-progress"></div>
     </div>
 
     <nav class="nav-container">
-        <div class="logo">
-            <i class="fas fa-gamepad"></i>
-            <span class="logo-text">Uncopylocked</span>
-        </div>
+      <div class="logo">
+        <i class="fas fa-gamepad"></i>
+        <span class="logo-text">Uncopylocked</span>
+      </div>
     </nav>
 
     <section class="hero">
-        <h1 class="fortext">Copy Games:</h1>
-        <form id="extractForm" method="post" action="/">
-            <div class="input-container">
-                <div class="error-message" id="error-message"></div>     
-                <div id="inputs" class="input-wrapper">
-                    <i class="fas fa-link icon-url"></i>
-                    <input name="place_id" id="urlInput" type="password" placeholder="Paste the game here..." autocomplete="off" />
-                    <button id="pasteButton" class="button-paste" type="button">
-                        <i class="fas fa-clipboard" id="Cclear"></i>
-                        <i class="fas fa-times" id="Xclear" style="display:none;"></i>
-                        <span>Paste</span>
-                    </button>
-                </div>
+      <form id="extractForm" method="post" action="/">
+        <div class="container">
+          <h1 class="fortext">Uncopylocked Games Extractor</h1>
+          <p class="subtitle">Paste game link in the box below, then click "Extract Game!"</p>
 
-                <button id="fetchImages" type="submit" class="buttons">
-                    <i class="fas fa-download" id="btn-icon"></i>
-                    <span id="btn-text">Copy Game!</span>
-                </button>
-            </div>
-        </form>
+          <div id="gameDetectedMessage" class="game-detected-message">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span id="gameMessageText"></span>
+          </div>
+
+          <div class="error-message" id="error-message"></div>
+          <div id="inputs" class="input-wrapper">
+            <i class="fas fa-link icon-url"></i>
+            <input
+              name="place_id"
+              id="urlInput"
+              type="password"
+              placeholder="Paste the game here..."
+              autocomplete="off"
+            />
+            <button id="pasteButton" class="button-paste" type="button">
+              <i class="fas fa-clipboard" id="icon-paste"></i>
+              <i class="fas fa-times" id="icon-clear" style="display: none"></i>
+              <span>Paste</span>
+            </button>
+          </div>
+
+          <button id="fetchImages" type="submit" class="buttons">
+            <i class="fas fa-download" id="btn-icon"></i>
+            <span id="btn-text">Extract Game!</span>
+          </button>
+        </div>
+      </form>
     </section>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-</body>
+  </body>
 </html>
