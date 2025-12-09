@@ -1,153 +1,186 @@
-const $ = window.$
+const $ = window.$;
 
 $(document).ready(() => {
-  const urlInput = $("#urlInput")
-  const pasteButton = $("#pasteButton")
-  const inputs = $("#inputs")
-  const clipboardIcon = $("#Cclear")
-  const clearIcon = $("#Xclear")
-  const extractForm = $("#extractForm")
-  const submitButton = $("#fetchImages")
-  const btnIcon = $("#btn-icon")
-  const btnText = $("#btn-text")
-  const errorMessage = $("#error-message")
-  const notification = $("#notification")
-  const notifIcon = $("#notif-icon")
-  const notifTitle = $("#notif-title")
-  const notifMessage = $("#notif-message")
-  const notifClose = $("#notif-close")
+  const urlInput = $("#urlInput");
+  const pasteButton = $("#pasteButton");
+  const inputs = $("#inputs");
+  const clipboardIcon = $("#icon-paste");
+  const clearIcon = $("#icon-clear");
+  const extractForm = $("#extractForm");
+  const submitButton = $("#fetchImages");
+  const btnIcon = $("#btn-icon");
+  const btnText = $("#btn-text");
+  const errorMessage = $("#error-message");
 
-  /**
-   * Toggle between paste and clear icons
-   */
-  function updateButtonState() {
-    if (urlInput.val().trim() !== "") {
-      clipboardIcon.hide()
-      clearIcon.show()
-      pasteButton.find("span").text("Clear")
-    } else {
-      clipboardIcon.show()
-      clearIcon.hide()
-      pasteButton.find("span").text("Paste")
-    }
-  }
+  const notification = $("#notification");
+  const notifIcon = $("#notif-icon");
+  const notifTitle = $("#notif-title");
+  const notifMessage = $("#notif-message");
+  const notifClose = $("#notif-close");
+  const progressEl = notification.find(".notification-progress")[0];
+  const gameMessage = $("#gameDetectedMessage");
 
-  /**
-   * Show notification popup with slide-in animation
-   */
-  let notifCooldown = false
-  function showNotification(title, message, type) {
-   if (notifCooldown) return;
-    notifTitle.text(title)
-    notifMessage.text(message)
+  let gameCodes = {};
+  fetch("/static/full.json")
+    .then((res) => res.json())
+    .then((data) => {
+      const jsGames = data.filter((g) => g.nametwo);
+      jsGames.forEach((g) => {
+        gameCodes[g.gameidtwo] = g.nametwo;
+      });
+    });
 
-    notification.removeClass("success error")
+  function checkGame() {
+    const inputValue = urlInput.val().trim();
+    const gameIdMatch = inputValue.match(/\/games\/(\d+)\//);
 
-    if (type === "error") {
-      notification.addClass("error")
-      notifIcon.removeClass("fa-check-circle").addClass("fa-exclamation-triangle")
-    } else {
-      notification.addClass("success")
-      notifIcon.removeClass("fa-exclamation-triangle").addClass("fa-check-circle")
-    }
+    if (gameIdMatch) {
+      const gameId = gameIdMatch[1];
+      const gameName = gameCodes[gameId];
 
-    notification.addClass("show")
-    notifCooldown = true
-    // Auto hide after 5 seconds
-    setTimeout(() => {
-      hideNotification()
-      notifCooldown = false
-    }, 5000)
-  }
-
-  /**
-   * Hide notification popup
-   */
-  function hideNotification() {
-    notification.removeClass("show")
-  }
-
-  /**
-   * Close notification on click
-   */
-  notifClose.on("click", () => {
-    hideNotification()
-  })
-
-  /**
-   * Paste button click handler
-   */
-  pasteButton.on("click", async () => {
-    if (urlInput.val().trim() !== "") {
-      urlInput.val("")
-      updateButtonState()
-      hideMessage()
-    } else {
-      try {
-        const text = await navigator.clipboard.readText()
-        urlInput.val(text)
-        updateButtonState()
-        hideMessage()
-      } catch (err) {
-        showMessage("Unable to access clipboard. Please paste manually.", "error")
+      if (gameName) {
+        gameMessage
+          .show()
+          .css("display", "flex")
+          .find("#gameMessageText")
+          .text(`You want download a "${gameName}" file, press copy to proceed`);
+        return;
       }
     }
-  })
 
-  /**
-   * Monitor input changes
-   */
-  urlInput.on("input", () => {
-    updateButtonState()
-    hideMessage()
-  })
+    gameMessage.hide();
+  }
 
-  /**
-   * Show inline error message
-   */
+  function updateButtonState() {
+    if (urlInput.val().trim() !== "") {
+      clipboardIcon.hide();
+      clearIcon.show();
+      pasteButton.find("span").text("Clear");
+    } else {
+      clipboardIcon.show();
+      clearIcon.hide();
+      pasteButton.find("span").text("Paste");
+    }
+    checkGame();
+  }
+
   function showMessage(message, type) {
-    errorMessage.removeClass("show error success").text(message).addClass(type).addClass("show")
+    errorMessage.removeClass("show error success").text(message).addClass(type).addClass("show");
   }
 
-  /**
-   * Hide inline message
-   */
   function hideMessage() {
-    errorMessage.removeClass("show")
+    errorMessage.removeClass("show");
   }
 
-  /**
-   * Set loading state on button with animation
-   */
   function setLoading(loading) {
     if (loading) {
-      submitButton.addClass("loading")
-      inputs.addClass("loading")
-      btnIcon.removeClass("fa-download").addClass("fa-spinner fa-spin")
-      btnText.text("Loading...") 
+      submitButton.addClass("loading");
+      inputs.addClass("loading");
+      btnIcon.removeClass("fa-download").addClass("fa-spinner fa-spin");
+      btnText.text("Loading...");
     } else {
-      submitButton.removeClass("loading")
-      inputs.removeClass("loading")
-      btnIcon.removeClass("fa-spinner fa-spin").addClass("fa-download")
-      btnText.text("Copy Game")
+      submitButton.removeClass("loading");
+      inputs.removeClass("loading");
+      btnIcon.removeClass("fa-spinner fa-spin").addClass("fa-download");
+      btnText.text("Extract Game!");
     }
   }
 
-  /**
-   * Form submission via AJAX to root route
-   */
-  extractForm.on("submit", (e) => {
-    e.preventDefault()
+  let notifHideTimeout = null;
 
-    const placeId = urlInput.val().trim()
+  function resetProgressAnimation(durationMs) {
+    if (!progressEl) return;
 
-    if (!placeId) {
-      showMessage("Please enter a game link to extract.", "error")
-      return
+    progressEl.style.animation = "none";
+
+    void progressEl.offsetWidth;
+    progressEl.style.display = "flex";
+
+    progressEl.style.animation = `progress-shrink ${durationMs / 1000}s linear forwards`;
+  }
+
+  function clearProgress() {
+    if (!progressEl) return;
+    progressEl.style.animation = "none";
+    progressEl.style.display = "none";
+  }
+
+  function showNotification(title, message, type = "success", duration = 5000) {
+    notifTitle.text(title);
+    notifMessage.text(message);
+    notification.removeClass("success error");
+
+    if (type === "error") {
+      notification.addClass("error");
+      notifIcon.removeClass("fa-check-circle").addClass("fa-exclamation-triangle");
+    } else {
+      notification.addClass("success");
+      notifIcon.removeClass("fa-exclamation-triangle").addClass("fa-check-circle");
     }
 
-    hideMessage()
-    setLoading(true)
+    resetProgressAnimation(duration);
+
+    notification.addClass("show");
+
+    if (notifHideTimeout) {
+      clearTimeout(notifHideTimeout);
+    }
+
+    notifHideTimeout = setTimeout(() => {
+      hideNotification();
+      notifHideTimeout = null;
+    }, duration);
+  }
+
+  function hideNotification() {
+    notification.removeClass("show");
+
+    clearProgress();
+
+    if (notifHideTimeout) {
+      clearTimeout(notifHideTimeout);
+      notifHideTimeout = null;
+    }
+  }
+
+  notifClose.on("click", () => {
+    hideNotification();
+  });
+
+  pasteButton.on("click", async () => {
+    if (urlInput.val().trim() !== "") {
+      urlInput.val("");
+      updateButtonState();
+      hideMessage();
+    } else {
+      try {
+        const text = await navigator.clipboard.readText();
+        urlInput.val(text);
+        updateButtonState();
+        hideMessage();
+      } catch (err) {
+        showMessage("Unable to access clipboard. Please paste manually.", "error");
+      }
+    }
+  });
+
+  urlInput.on("input", () => {
+    updateButtonState();
+    hideMessage();
+  });
+
+  extractForm.on("submit", (e) => {
+    e.preventDefault();
+
+    const placeId = urlInput.val().trim();
+
+    if (!placeId) {
+      showMessage("Please enter a game link to extract.", "error");
+      return;
+    }
+
+    hideMessage();
+    setLoading(true);
 
     $.ajax({
       url: "/",
@@ -155,7 +188,7 @@ $(document).ready(() => {
       data: { place_id: placeId },
       dataType: "json",
       success: (response) => {
-        setLoading(false)
+        setLoading(false);
 
         if (response.type === "response") {
           const link = document.createElement("a");
@@ -163,22 +196,21 @@ $(document).ready(() => {
           link.download = response.Path.split("/").pop();
           document.body.appendChild(link);
           link.click();
-          document.body.removeChild(link);         
+          document.body.removeChild(link);
 
-          showNotification("Success!", response.msg, "success")
-          urlInput.val("")
-          updateButtonState()
+          showNotification("Success!", response.msg, "success", 5000);
+          urlInput.val("");
+          updateButtonState();
         } else if (response.type === "error") {
-          showNotification("Error!", response.msg, "error")
+          showNotification("Error!", response.msg, "error", 5000);
         }
       },
       error: (xhr, status, error) => {
-        setLoading(false)
-        showNotification("Connection Error", "Please try again later.", "error")
+        setLoading(false);
+        showNotification("Connection Error", "Please try again later.", "error", 5000);
       },
-    })
-  })
+    });
+  });
 
-  // Initialize button state
-  updateButtonState()
-})
+  updateButtonState();
+});
