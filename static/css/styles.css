@@ -1,5 +1,5 @@
 :root {
-  --bg-primary: #0a0a0f;
+  --bg-primary: #2c2c2c;
   --bg-secondary: #12121a;
   --bg-card: #1a1a25;
   --neon-blue: #00d4ff;
@@ -12,12 +12,15 @@
   --border-color: #2a2a3a;
   --shadow-neon: 0 0 20px rgba(0, 212, 255, 0.3);
   --shadow-neon-strong: 0 0 30px rgba(0, 212, 255, 0.5);
+  --input-bg: #4a4a5a;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
 }
 
 html,
@@ -32,8 +35,7 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   overflow-x: hidden;
-  background-image: radial-gradient(ellipse at top, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at bottom, rgba(0, 212, 255, 0.05) 0%, transparent 50%);
+  background-image: radial-gradient(circle at 10% 20%, rgba(0, 255, 255, 0.05) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(255, 0, 204, 0.05) 0%, transparent 20%);
 }
 
 .notification {
@@ -144,11 +146,12 @@ body {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 3px;
+  height: 4px;
   background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
   width: 100%;
   transform-origin: left;
-  animation: progress-shrink 5s linear forwards;
+  /* animation removed — will be applied from JS so it restarts each time */
+  animation: none;
 }
 
 .notification.error .notification-progress {
@@ -166,14 +169,20 @@ body {
 
 .nav-container {
   width: 100%;
-  padding: 1rem 2rem;
-  background: linear-gradient(180deg, rgba(18, 18, 26, 0.95) 0%, rgba(10, 10, 15, 0.9) 100%);
+  height: 60px;
+  background-color: rgba(28, 28, 28, 0.95);
   border-bottom: 1px solid var(--border-color);
   backdrop-filter: blur(10px);
+  padding: 0 20px;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
 }
 
 .logo {
@@ -205,7 +214,6 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /*min-height: 100vh;*/
   padding: 6rem 1.5rem 2rem;
   text-align: center;
 }
@@ -222,6 +230,43 @@ body {
   background-clip: text;
   background-size: 200% 200%;
   animation: text-shimmer 3s ease-in-out infinite;
+}
+
+.subtitle {
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 2rem;
+  max-width: 500px;
+  padding: 2rem;
+  background-color: rgba(44, 44, 44, 0.7);
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.5s ease-in-out;
+  width: 100%;
+  gap: 1.25rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .input-container {
@@ -272,11 +317,12 @@ body {
   position: relative;
   display: flex;
   align-items: center;
-  background: var(--bg-card);
+  background: var(--input-bg);
   border: 2px solid var(--border-color);
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .input-wrapper:hover {
@@ -306,14 +352,15 @@ body {
   background: transparent;
   border: none;
   outline: none;
-  color: var(--text-primary);
+  color: #ffffff !important;
   font-family: "Rajdhani", sans-serif;
   font-size: 1rem;
   font-weight: 500;
+  caret-color: var(--neon-blue);
 }
 
 #urlInput::placeholder {
-  color: var(--text-secondary);
+  color: #9999aa;
 }
 
 .button-paste {
@@ -409,7 +456,7 @@ body {
   background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
   box-shadow: none;
 }
- 
+
 .input-wrapper.loading::before {
   display: none;
 }
@@ -447,8 +494,12 @@ body {
     * {
         cursor: default !important;
     }
+
   .nav-container {
-    padding: 0.875rem 1.25rem;
+    height: 56px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
   }
 
   .logo i {
@@ -486,8 +537,8 @@ body {
   }
 
   .buttons {
-    padding: 1rem 1.5rem;
     font-size: 1rem;
+    padding: 1rem 1.5rem;
   }
 
   .notification {
@@ -533,4 +584,39 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--neon-blue);
+}
+
+.game-detected-message {
+  background: rgba(46, 204, 113, 0.1);
+  border: 1px solid rgba(46, 204, 113, 0.3);
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  display: none;
+  align-items: center;
+  gap: 12px;
+  animation: slideDown 0.3s ease;
+}
+   
+.game-detected-message svg {
+  color: #2ecc71;
+  flex-shrink: 0;
+}
+
+.game-detected-message span {
+  color: #2ecc71;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
