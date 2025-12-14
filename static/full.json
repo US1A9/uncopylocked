@@ -15,9 +15,9 @@
         "name": "Tower-of-Hell.rbxl"
     },
     {
-        "DEFAULTgameid": "109983668079237",
-        "DEFAULTpath": "static/Steal-a-Brainrot.rbxl",
-        "DEFAULTname": "Steal-a-Brainrot.rbxl"
+        "DEFAULTgameid": "None",
+        "DEFAULTpath": "None",
+        "DEFAULTname": "None"
     },
     
     {
@@ -32,4 +32,5 @@
         "nametwo": "Tower of Hell",
         "gameidtwo": "1962086868"
     }
+
 ]
