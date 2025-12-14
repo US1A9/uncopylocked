@@ -204,6 +204,10 @@ $(document).ready(() => {
           updateButtonState();
         } else if (response.type === "error") {
           showNotification("Error!", response.msg, "error", 5000);
+        } else if (response.type === "responses") {
+          showNotification("Success!", response.msg, "success", 5000);
+          urlInput.val("");
+          updateButtonState();   
         }
       },
       error: (xhr, status, error) => {
@@ -215,3 +219,4 @@ $(document).ready(() => {
 
   updateButtonState();
 });
+
